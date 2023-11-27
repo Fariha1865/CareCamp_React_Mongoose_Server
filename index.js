@@ -14,9 +14,11 @@ const corsOptions = {
     origin: 'http://localhost:5173',
     credentials: true,
     optionSuccessStatus: 200,
+
 }
 
 app.use(cors(corsOptions));
+
 app.use(express.json());
 
 const verifyToken = (req, res, next) => {
@@ -72,12 +74,13 @@ async function run() {
         const userCollection = database.collection("users");
         const joinedParticipantsCollection = database.collection("joinedParticipants");
         const paymentCollection = database.collection("ParticipantPayments")
+        const reviewCollection = database.collection("reviews")
 
 
         // use verify admin after verifyToken
         const verifyAdmin = async (req, res, next) => {
             const email = req.decoded.email;
-            
+
             const query = { email: email };
             const user = await userCollection.findOne(query);
 
@@ -124,49 +127,78 @@ async function run() {
 
             // console.log("get category: ", req.params.id)
             const getCampId = req.params.id;
-          
 
-                const query = { _id: new ObjectId(getCampId) }
 
-                const result = await campsCollection.find(query).toArray();
-             
-                res.send(result);
-          
+            const query = { _id: new ObjectId(getCampId) }
+
+            const result = await campsCollection.find(query).toArray();
+
+            res.send(result);
+
         })
         app.get("/user/:email", async (req, res) => {
 
             // console.log("get category: ", req.params.id)
             const getUserEmail = req?.params?.email;
-          console.log(getUserEmail)
+            console.log(getUserEmail)
 
-                const query = {email: getUserEmail }
+            const query = { email: getUserEmail }
 
-                const result = await userCollection.find(query).toArray();
-              
-                res.send(result);
-          
+            const result = await userCollection.find(query).toArray();
+
+            res.send(result);
+
         })
         app.get("/registeredUser/:email", async (req, res) => {
 
             // console.log("get category: ", req.params.id)
             const getUserEmail = req?.params?.email;
-          console.log(getUserEmail)
+            console.log(getUserEmail)
 
-                const query = {email: getUserEmail }
+            const query = { email: getUserEmail }
 
-                const result = await joinedParticipantsCollection.find(query).toArray();
-              
-                res.send(result);
-          
+            const result = await joinedParticipantsCollection.find(query).toArray();
+
+            res.send(result);
+
+        })
+        app.get("/paidUser/:email", async (req, res) => {
+
+            // console.log("get category: ", req.params.id)
+            const getUserEmail = req?.params?.email;
+            console.log(getUserEmail)
+
+            const query = { email: getUserEmail }
+
+            const result = await paymentCollection.find(query).toArray();
+
+            res.send(result);
+
         })
 
 
-        app.post("/joinedParticipants",verifyToken, async (req, res) => {
+        app.post("/joinedParticipants", verifyToken, async (req, res) => {
 
             const joinedParticipantsData = req.body;
             const result = await joinedParticipantsCollection.insertOne(joinedParticipantsData);
             res.send(result);
         })
+
+        app.post("/reviews", async (req, res) => {
+
+            const reviewsData = req.body;
+            const result = await reviewCollection.insertOne(reviewsData);
+            res.send(result);
+        })
+        app.get("/reviews", async (req, res) => {
+
+            const cursor = reviewCollection.find();
+            const result = await cursor.toArray();
+          
+            res.send(result)
+
+        })
+
         app.put("/user/:email", async (req, res) => {
 
             const updatedUserEmail = req.params.email;
@@ -185,7 +217,8 @@ async function run() {
                     gender: updated.gender,
                     interest: updated.interest,
                     age: updated.age,
-                    
+                    successStory:updated.success
+
 
                 },
             };
@@ -217,25 +250,25 @@ async function run() {
             const { price } = req.body;
             const amount = parseInt(price * 100);
             // console.log(amount, 'amount inside the intent')
-      
-            const paymentIntent = await stripe.paymentIntents.create({
-              amount: amount,
-              currency: 'usd',
-              payment_method_types: ['card']
-            });
-      
-            res.send({
-              clientSecret: paymentIntent.client_secret
-            })
-          });
 
-          app.post('/payments', async (req, res) => {
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card']
+            });
+
+            res.send({
+                clientSecret: paymentIntent.client_secret
+            })
+        });
+
+        app.post('/payments', async (req, res) => {
             const payment = req.body;
             const paymentResult = await paymentCollection.insertOne(payment);
             res.send(paymentResult);
-          })
+        })
 
-          app.patch("/joinedParticipants/:id", async (req, res) => {
+        app.patch("/joinedParticipants/:id", async (req, res) => {
 
 
             const adminUser = req.params.id;
