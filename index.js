@@ -405,6 +405,19 @@ async function run() {
 
 
         });
+        app.delete("/deleteGrowingParticipants/:id", async (req, res) => {
+
+
+            const deleteItem = req.params.id;
+
+            const query = { _id: new ObjectId(deleteItem) };
+
+            const result = await growingParticipantsCollection.deleteOne(query);
+            res.send(result)
+
+
+
+        });
 
 
         //Payment............
