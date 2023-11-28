@@ -75,6 +75,9 @@ async function run() {
         const joinedParticipantsCollection = database.collection("joinedParticipants");
         const paymentCollection = database.collection("ParticipantPayments")
         const reviewCollection = database.collection("reviews")
+        const upcomingCampsCollection = database.collection("upcomingCamps")
+        const growingParticipantsCollection = database.collection("growingParticipants")
+        const interestedProfessionals = database.collection("interestedProfessionals")
 
 
         // use verify admin after verifyToken
@@ -123,6 +126,14 @@ async function run() {
             res.send(result)
 
         })
+        app.get("/upcomingCamps", async (req, res) => {
+
+            const cursor = upcomingCampsCollection.find();
+            const result = await cursor.toArray();
+            console.log(result)
+            res.send(result)
+
+        })
         app.get("/registeredCamps", async (req, res) => {
 
             const cursor = joinedParticipantsCollection.find();
@@ -131,10 +142,28 @@ async function run() {
             res.send(result)
 
         })
+        app.get("/registeredCamps/:email", async (req, res) => {
+
+            const getOrgEmail = req.params.email;
+            console.log(getOrgEmail)
+
+            const query = { 'campData.email': getOrgEmail }
+
+            const result = await joinedParticipantsCollection.find(query).toArray();
+
+            res.send(result);
+
+        })
         app.post("/camps", async (req, res) => {
 
             const campsData = req.body;
             const result = await campsCollection.insertOne(campsData);
+            res.send(result);
+        })
+        app.post("/upcomingCamps", async (req, res) => {
+
+            const campsData = req.body;
+            const result = await upcomingCampsCollection.insertOne(campsData);
             res.send(result);
         })
         app.get("/camps/:email", async (req, res) => {
@@ -163,6 +192,7 @@ async function run() {
             res.send(result);
 
         })
+
         app.get("/details/:id", async (req, res) => {
 
             // console.log("get category: ", req.params.id)
@@ -172,6 +202,19 @@ async function run() {
             const query = { _id: new ObjectId(getCampId) }
 
             const result = await campsCollection.find(query).toArray();
+
+            res.send(result);
+
+        })
+        app.get("/upcomingDetails/:id", async (req, res) => {
+
+            // console.log("get category: ", req.params.id)
+            const getCampId = req.params.id;
+
+
+            const query = { _id: new ObjectId(getCampId) }
+
+            const result = await upcomingCampsCollection.find(query).toArray();
 
             res.send(result);
 
@@ -223,6 +266,18 @@ async function run() {
             const result = await joinedParticipantsCollection.insertOne(joinedParticipantsData);
             res.send(result);
         })
+        app.post("/growingParticipants", verifyToken, async (req, res) => {
+
+            const joinedParticipantsData = req.body;
+            const result = await growingParticipantsCollection.insertOne(joinedParticipantsData);
+            res.send(result);
+        })
+        app.post("/interestedProfessionals", verifyToken, async (req, res) => {
+
+            const interestedProfessionalsData = req.body;
+            const result = await interestedProfessionals.insertOne(interestedProfessionalsData);
+            res.send(result);
+        })
 
         app.post("/reviews", async (req, res) => {
 
@@ -257,7 +312,9 @@ async function run() {
                     gender: updated.gender,
                     interest: updated.interest,
                     age: updated.age,
-                    successStory: updated.success
+                    successStory: updated.success,
+                    certification:updated.certification,
+                    specialty:updated.specialty
 
 
                 },
