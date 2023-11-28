@@ -12,10 +12,10 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const corsOptions = {
     origin: ["http://localhost:5173",
-             "https://api.imgbb.com",
-              "https://hoscamp.netlify.app"
+        "https://api.imgbb.com",
+        "https://hoscamp.netlify.app"
 
-],
+    ],
     credentials: true,
     optionSuccessStatus: 200,
 
@@ -202,7 +202,7 @@ async function run() {
 
             // console.log("get category: ", req.params.id)
             const getCampId = req.params.id;
-           
+
 
             const query = { _id: new ObjectId(getCampId) }
 
@@ -332,8 +332,8 @@ async function run() {
                     interest: updated.interest,
                     age: updated.age,
                     successStory: updated.success,
-                    certification:updated.certification,
-                    specialty:updated.specialty
+                    certification: updated.certification,
+                    specialty: updated.specialty
 
 
                 },
@@ -350,7 +350,7 @@ async function run() {
 
             // console.log("blog to update", updatedBlogId)
 
-            const filter = {_id: new ObjectId(updatedCampId) }
+            const filter = { _id: new ObjectId(updatedCampId) }
 
             const options = { upsert: true };
 
@@ -367,7 +367,7 @@ async function run() {
                     Description: updated.Description,
                     email: updated.email
 
-              
+
 
 
                 },
@@ -479,8 +479,24 @@ async function run() {
 
                 }
             }
+        });
 
-            const result = await joinedParticipantsCollection.updateOne(query, updateDoc);
+        app.patch("/acceptProfessional/:id", async (req, res) => {
+
+
+            const getId = req.params.id;
+
+            const query = { _id: new ObjectId(getId) };
+
+            const updateDoc = {
+                $set: {
+
+                    status: 'Accepted'
+
+                }
+            }
+
+            const result = await interestedProfessionals.updateOne(query, updateDoc);
             res.send(result)
 
 
