@@ -188,7 +188,6 @@ async function run() {
         })
         app.get("/camps/:email", async (req, res) => {
 
-            // console.log("get category: ", req.params.id)
             const getUserEmail = req.params.email;
 
 
