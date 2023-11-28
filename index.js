@@ -123,6 +123,46 @@ async function run() {
             res.send(result)
 
         })
+        app.get("/registeredCamps", async (req, res) => {
+
+            const cursor = joinedParticipantsCollection.find();
+            const result = await cursor.toArray();
+            console.log(result)
+            res.send(result)
+
+        })
+        app.post("/camps", async (req, res) => {
+
+            const campsData = req.body;
+            const result = await campsCollection.insertOne(campsData);
+            res.send(result);
+        })
+        app.get("/camps/:email", async (req, res) => {
+
+            // console.log("get category: ", req.params.id)
+            const getUserEmail = req.params.email;
+
+
+            const query = { email: getUserEmail }
+
+            const result = await campsCollection.find(query).toArray();
+
+            res.send(result);
+
+        })
+        app.get("/camp/:id", async (req, res) => {
+
+            // console.log("get category: ", req.params.id)
+            const getCampId = req.params.id;
+           
+
+            const query = { _id: new ObjectId(getCampId) }
+
+            const result = await campsCollection.find(query).toArray();
+
+            res.send(result);
+
+        })
         app.get("/details/:id", async (req, res) => {
 
             // console.log("get category: ", req.params.id)
@@ -194,7 +234,7 @@ async function run() {
 
             const cursor = reviewCollection.find();
             const result = await cursor.toArray();
-          
+
             res.send(result)
 
         })
@@ -217,13 +257,47 @@ async function run() {
                     gender: updated.gender,
                     interest: updated.interest,
                     age: updated.age,
-                    successStory:updated.success
+                    successStory: updated.success
 
 
                 },
             };
 
             const result = await userCollection.updateOne(filter, updateBlog, options);
+
+            res.send(result);
+        })
+        app.put("/updateCamps/:id", async (req, res) => {
+
+            const updatedCampId = req.params.id;
+            const updated = req.body;
+
+            // console.log("blog to update", updatedBlogId)
+
+            const filter = {_id: new ObjectId(updatedCampId) }
+
+            const options = { upsert: true };
+
+            const updateBlog = {
+                $set: {
+                    CampName: updated.CampName,
+                    CampFees: updated.CampFees,
+                    ScheduledDateTime: updated.ScheduledDateTime,
+                    Venue: updated.Venue,
+                    Location: updated.Location,
+                    SpecializedServices: updated.SpecializedServices,
+                    HealthcareProfessionals: updated.HealthcareProfessionals,
+                    TargetAudience: updated.TargetAudience,
+                    Description: updated.Description,
+                    email: updated.email
+
+              
+
+
+                },
+            };
+
+            const result = await campsCollection.updateOne(filter, updateBlog, options);
 
             res.send(result);
         })
@@ -237,6 +311,19 @@ async function run() {
             const query = { _id: new ObjectId(deleteItem) };
 
             const result = await joinedParticipantsCollection.deleteOne(query);
+            res.send(result)
+
+
+
+        });
+        app.delete("/camps/:id", async (req, res) => {
+
+
+            const deleteItem = req.params.id;
+
+            const query = { _id: new ObjectId(deleteItem) };
+
+            const result = await campsCollection.deleteOne(query);
             res.send(result)
 
 
@@ -279,6 +366,48 @@ async function run() {
                 $set: {
 
                     payment: 'Paid'
+
+                }
+            }
+
+            const result = await joinedParticipantsCollection.updateOne(query, updateDoc);
+            res.send(result)
+
+
+
+        });
+        app.patch("/confirmRegistration/:id", async (req, res) => {
+
+
+            const adminUser = req.params.id;
+
+            const query = { _id: new ObjectId(adminUser) };
+
+            const updateDoc = {
+                $set: {
+
+                    status: 'Confirmed'
+
+                }
+            }
+
+            const result = await joinedParticipantsCollection.updateOne(query, updateDoc);
+            res.send(result)
+
+
+
+        });
+        app.patch("/cancelRegistration/:id", async (req, res) => {
+
+
+            const adminUser = req.params.id;
+
+            const query = { _id: new ObjectId(adminUser) };
+
+            const updateDoc = {
+                $set: {
+
+                    status: 'Cancelled'
 
                 }
             }
