@@ -133,18 +133,33 @@ async function run() {
         })
         app.get("/popularCamps", async (req, res) => {
 
-            const cursor = popularCampsCollection.find();
+            
+            const query = { type: "popular" }
+
+            const result = await campsCollection.find(query).toArray();
+
+            res.send(result);
+
+        })
+        app.get("/upcomingCamps", async (req, res) => {
+
+            
+            const cursor = upcomingCampsCollection.find();
             const result = await cursor.toArray();
             console.log(result)
             res.send(result)
 
         })
-        app.get("/upcomingCamps", async (req, res) => {
+        app.get("/upcomingCamps/:email", async (req, res) => {
 
-            const cursor = upcomingCampsCollection.find();
-            const result = await cursor.toArray();
-            console.log(result)
-            res.send(result)
+            const getOrgEmail = req.params.email;
+            console.log(getOrgEmail)
+
+            const query = { email: getOrgEmail }
+
+            const result = await upcomingCampsCollection.find(query).toArray();
+
+            res.send(result);
 
         })
         app.get("/growingParticipants", async (req, res) => {
@@ -422,6 +437,19 @@ async function run() {
             const query = { _id: new ObjectId(deleteItem) };
 
             const result = await growingParticipantsCollection.deleteOne(query);
+            res.send(result)
+
+
+
+        });
+        app.delete("/upcoming/:id", async (req, res) => {
+
+
+            const deleteItem = req.params.id;
+
+            const query = { _id: new ObjectId(deleteItem) };
+
+            const result = await upcomingCampsCollection.deleteOne(query);
             res.send(result)
 
 
