@@ -77,11 +77,12 @@ async function run() {
         const cartCollection = database.collection("cart");
         const userCollection = database.collection("users");
         const joinedParticipantsCollection = database.collection("joinedParticipants");
-        const paymentCollection = database.collection("ParticipantPayments")
-        const reviewCollection = database.collection("reviews")
-        const upcomingCampsCollection = database.collection("upcomingCamps")
-        const growingParticipantsCollection = database.collection("growingParticipants")
-        const interestedProfessionals = database.collection("interestedProfessionals")
+        const paymentCollection = database.collection("ParticipantPayments");
+        const reviewCollection = database.collection("reviews");
+        const upcomingCampsCollection = database.collection("upcomingCamps");
+        const growingParticipantsCollection = database.collection("growingParticipants");
+        const interestedProfessionals = database.collection("interestedProfessionals");
+        const popularCampsCollection = database.collection("popularCamps");
 
 
         // use verify admin after verifyToken
@@ -125,6 +126,14 @@ async function run() {
         app.get("/camps", async (req, res) => {
 
             const cursor = campsCollection.find();
+            const result = await cursor.toArray();
+            console.log(result)
+            res.send(result)
+
+        })
+        app.get("/popularCamps", async (req, res) => {
+
+            const cursor = popularCampsCollection.find();
             const result = await cursor.toArray();
             console.log(result)
             res.send(result)
