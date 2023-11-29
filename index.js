@@ -512,8 +512,6 @@ async function run() {
             const result = await joinedParticipantsCollection.updateOne(query, updateDoc);
             res.send(result)
 
-
-
         });
         app.patch("/confirmRegistration/:id", async (req, res) => {
 
