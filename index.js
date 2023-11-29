@@ -301,6 +301,19 @@ async function run() {
             res.send(result);
 
         })
+        app.get("/interestedProfessionals/:email", async (req, res) => {
+
+            // console.log("get category: ", req.params.id)
+            const getUserEmail = req?.params?.email;
+            console.log(getUserEmail)
+
+            const query = { email: getUserEmail }
+
+            const result = await interestedProfessionals.find(query).toArray();
+
+            res.send(result);
+
+        })
 
 
         app.post("/joinedParticipants", verifyToken, async (req, res) => {
@@ -516,6 +529,8 @@ async function run() {
 
                 }
             }
+            const result = await joinedParticipantsCollection.updateOne(query, updateDoc);
+            res.send(result)
         });
 
         app.patch("/acceptProfessional/:id", async (req, res) => {
