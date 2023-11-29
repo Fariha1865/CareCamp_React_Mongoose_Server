@@ -530,6 +530,31 @@ async function run() {
             const result = await joinedParticipantsCollection.updateOne(query, updateDoc);
             res.send(result)
         });
+        app.patch("/updateParticipantsCount/:id", async (req, res) => {
+
+
+            const campId = req.params.id;
+
+            const query = { _id: new ObjectId(campId) };
+
+            const camp = await campsCollection.findOne(query);
+            const currentParticipants = parseInt(camp.Participants, 10);
+
+             if (!isNaN(currentParticipants)) {
+            const updatedParticipants = currentParticipants + 1;
+
+            const updateDoc = {
+                $set: {
+                    Participants: updatedParticipants.toString(), // Convert back to string for storage
+                },
+            };
+
+            const result = await campsCollection.updateOne(query, updateDoc);
+            res.send(result);
+        } else {
+            res.status(400).send("Participants count is not a valid number");
+        }
+        });
 
         app.patch("/acceptProfessional/:id", async (req, res) => {
 
