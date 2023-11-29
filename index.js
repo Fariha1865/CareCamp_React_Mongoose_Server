@@ -548,7 +548,6 @@ async function run() {
                     Participants: updatedParticipants.toString(), // Convert back to string for storage
                 },
             };
-
             const result = await campsCollection.updateOne(query, updateDoc);
             res.send(result);
         } else {
