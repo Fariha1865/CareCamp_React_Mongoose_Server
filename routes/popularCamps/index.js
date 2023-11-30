@@ -2,9 +2,6 @@ const popularCamps = require('../../api/popularCamps/getPopularCamps')
 
 
 
-
-
-
 const router = require('express').Router()
 
 
