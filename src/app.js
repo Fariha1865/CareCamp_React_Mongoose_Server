@@ -25,9 +25,6 @@ const availableCampsData = require("../routes/getAvailableCamps/index")
 const upcomingCampsData = require("../routes/upcomingCamps/index");
 
 
-
-
-
 applyMiddleware(app)
 
 app.use(authenticationRoutes)
