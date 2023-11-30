@@ -8,5 +8,4 @@ router.post("/jwt", createJWTToken)
 
 router.post("/logout", logOut)
 
-
 module.exports = router
