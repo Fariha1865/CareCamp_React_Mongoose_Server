@@ -1,70 +1,14 @@
-const express = require('express');
-const app = express();
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+
+
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const port = process.env.PORT || 5000;
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 //middleWare
 
-const corsOptions = {
-    origin: ["http://localhost:5173",
-        "https://api.imgbb.com",
-        "https://hoscamp.netlify.app"
 
-    ],
-    credentials: true,
-    optionSuccessStatus: 200,
-
-}
-
-app.use(cors(corsOptions));
-
-app.use(express.json());
-
-const verifyToken = (req, res, next) => {
-    // const token = req?.cookies?.token;
-
-    // console.log(req.headers)
-
-    if (!req.headers.authorization) {
-        return res.status(401).send({ message: 'Unauthorized Access' });
-    }
-
-    const token = req.headers.authorization.split(' ')[1];
-    if (!token) {
-        return res.status(401).send({ message: 'Unauthorized Access' });
-    }
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-            console.log("error token")
-            return res.status(401).send({ message: 'Unauthorized Access' });
-        }
-
-        console.log("from verifyToken")
-        req.decoded = decoded;
-        next();
-
-    })
-
-}
-
-
-
-
-const uri = "mongodb+srv://coffeeUser:aTtr92UlSVyRtSqY@cluster0.5jqcqmr.mongodb.net/?retryWrites=true&w=majority";
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
 
 async function run() {
     try {
@@ -73,83 +17,16 @@ async function run() {
 
         const database = client.db("MedicalCampDB");
         const campsCollection = database.collection("camps");
-        const reviewsCollection = database.collection("reviews");
-        const cartCollection = database.collection("cart");
-        const userCollection = database.collection("users");
         const joinedParticipantsCollection = database.collection("joinedParticipants");
         const paymentCollection = database.collection("ParticipantPayments");
         const reviewCollection = database.collection("reviews");
         const upcomingCampsCollection = database.collection("upcomingCamps");
         const growingParticipantsCollection = database.collection("growingParticipants");
         const interestedProfessionals = database.collection("interestedProfessionals");
-        const popularCampsCollection = database.collection("popularCamps");
 
 
-        // use verify admin after verifyToken
-        const verifyAdmin = async (req, res, next) => {
-            const email = req.decoded.email;
-
-            const query = { email: email };
-            const user = await userCollection.findOne(query);
 
 
-            const isAdmin = user?.role === 'admin';
-            console.log("verifyAdmin" + isAdmin)
-            if (!isAdmin) {
-                return res.status(403).send({ message: 'forbidden access' });
-            }
-            next();
-        }
-        app.post("/jwt", async (req, res) => {
-
-            const user = req.body;
-            console.log("logging In" + JSON.stringify(user));
-
-
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
-
-
-            res.send(token);
-
-        })
-        app.post("/logout", async (req, res) => {
-
-            const user = req.body;
-            // console.log("logging out" + user);
-
-            res.clearCookie('token', { maxAge: 0, sameSite: 'none', secure: true })
-                .send({ success: true })
-
-        })
-
-
-        app.get("/camps", async (req, res) => {
-
-            const cursor = campsCollection.find();
-            const result = await cursor.toArray();
-            console.log(result)
-            res.send(result)
-
-        })
-        app.get("/popularCamps", async (req, res) => {
-
-            
-            const query = { type: "popular" }
-
-            const result = await campsCollection.find(query).toArray();
-
-            res.send(result);
-
-        })
-        app.get("/upcomingCamps", async (req, res) => {
-
-            
-            const cursor = upcomingCampsCollection.find();
-            const result = await cursor.toArray();
-            console.log(result)
-            res.send(result)
-
-        })
         app.get("/upcomingCamps/:email", async (req, res) => {
 
             const getOrgEmail = req.params.email;
@@ -262,19 +139,7 @@ async function run() {
             res.send(result);
 
         })
-        app.get("/user/:email", async (req, res) => {
 
-            // console.log("get category: ", req.params.id)
-            const getUserEmail = req?.params?.email;
-            console.log(getUserEmail)
-
-            const query = { email: getUserEmail }
-
-            const result = await userCollection.find(query).toArray();
-
-            res.send(result);
-
-        })
         app.get("/registeredUser/:email", async (req, res) => {
 
             // console.log("get category: ", req.params.id)
